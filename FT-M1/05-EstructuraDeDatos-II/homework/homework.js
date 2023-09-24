@@ -14,7 +14,8 @@ function LinkedList() {
   this.head = null;
 
   this.add = (value) => {
-    if (!this.head) this.head = new Node(value);    
+    if (!this.head) this.head = new Node(value);
+    
     else {
       let current = this.head;
       while (current.next) current = current.next;
@@ -24,13 +25,14 @@ function LinkedList() {
 
   this.remove = () => {
     if (!this.head) return null;
+
     if (!this.head.next) {
       const value = this.head.value;
       this.head = null;
       return value;
     }
     let current = this.head;
-    let prev = null;    
+    let prev = null;
     while (current.next) {
       prev = current;
       current = current.next;
@@ -41,6 +43,7 @@ function LinkedList() {
 
   this.search = (param) => {
     let current = this.head;
+
     if (typeof param === 'function') {
       while (current) {
         if (param(current.value)) return current.value;        
@@ -75,7 +78,52 @@ La clase debe tener los siguientes métodos:
 
 Ejemplo: supongamos que quiero guardar {instructora: 'Ani'} en la tabla. Primero puedo chequear, con hasKey, si ya hay algo en la tabla con el nombre 'instructora'; luego, invocando set('instructora', 'Ani'), se almacenará el par clave-valor en un bucket específico (determinado al hashear la clave)
 */
-function HashTable() {}
+function HashTable() {
+  this.numBuckets = 35;
+  this.buckets = new Array(this.numBuckets).fill(null).map(() => []);
+
+  this.hash = (key) => {
+    let total = 0;
+    
+    for (let i = 0; i < key.length; i++) total += key.charCodeAt(i);
+    return total % this.numBuckets;
+  };
+
+  this.set = (key, value) => {
+    if (typeof key !== 'string') throw new TypeError('Keys must be strings');  
+
+    const index = this.hash(key);
+    const bucket = this.buckets[index];
+
+    for (let i = 0; i < bucket.length; i++) {
+      if (bucket[i].key === key) {
+        bucket[i].value = value;
+        return;
+      }
+    }
+    bucket.push({ key, value });
+  };
+
+  this.get = (key) => {
+    const index = this.hash(key);
+    const bucket = this.buckets[index];
+
+    for (let i = 0; i < bucket.length; i++) {
+      if (bucket[i].key === key) return bucket[i].value;      
+    }
+    return undefined;
+  };
+
+  this.hasKey = (key) => {
+    const index = this.hash(key);
+    const bucket = this.buckets[index];
+
+    for (let i = 0; i < bucket.length; i++) {
+      if (bucket[i].key === key) return true;
+    }
+    return false;
+  };
+}
 
 // No modifiquen nada debajo de esta linea
 // --------------------------------
